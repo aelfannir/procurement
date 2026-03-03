@@ -20,10 +20,10 @@ description: "Task list template for feature implementation"
 
 ## Path Conventions
 
-- **Single project**: `src/`, `tests/` at repository root
-- **Web app**: `backend/src/`, `frontend/src/`
-- **Mobile**: `api/src/`, `ios/src/` or `android/src/`
-- Paths shown below assume single project - adjust based on plan.md structure
+- **Target: api** → `procurement-api/src/`, `procurement-api/tests/`
+- **Target: app** → `procurement-app/src/`
+- **Target: both** → use both paths above
+- Adjust based on plan.md structure and spec Target field
 
 <!-- 
   ============================================================================

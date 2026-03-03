@@ -2,5 +2,8 @@
 procurement-api
 procurement-app
 
+# MCP config (contains API tokens)
+.mcp.json
+
 # IDE
 .idea/

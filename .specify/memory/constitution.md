@@ -25,7 +25,7 @@ This workspace encompasses both sub-projects:
 - **procurement-api/** — Backend (PHP 8.2 / Symfony 7.x / API Platform 4.x / PostgreSQL)
 - **procurement-app/** — Frontend (React / TypeScript / Vite)
 
-Specs created at this level are **cross-cutting** — they involve changes in both API and App. For single-project work, use the per-project `.specify` setup instead.
+All specs (API-only, frontend-only, or cross-cutting) live here. Each spec declares a Target field: `api`, `app`, or `both`.
 
 ## Core Principles
 

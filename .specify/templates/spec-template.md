@@ -1,6 +1,6 @@
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[###-feature-name]`
+**Feature Branch**: `[ACHAT-XXX-short-name]`
 **Created**: [DATE]
 **Status**: Draft
 **Target**: [api | app | both]
