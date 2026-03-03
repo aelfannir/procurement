@@ -16,13 +16,21 @@ This workspace is the orchestration layer for the development pipeline — from 
 
 ### Step 1 — Assess the task
 
-Before anything else, fetch the Jira issue and assess it:
+Fetch the Jira issue, then:
 
-| Question | Action |
-|----------|--------|
-| Is it a duplicate? | Close it in Jira, link to the original. Stop. |
-| Is it invalid or incompatible with the architecture? | Add a comment in Jira explaining why. Flag to PO. Stop. |
-| Is it valid? | Continue to Step 2. |
+**If the task is back In Progress (QA rejection):**
+1. Find the linked QA test issue
+2. Read the rejection reason and comments before touching any code
+3. Fix based on the QA feedback, not assumptions
+
+**If starting fresh:**
+1. Search for related open issues: `project = ACHAT AND statusCategory != Done AND text ~ "keyword"` — catch duplicates or overlapping bugs
+2. If a duplicate is found: close this issue, link to the original. Stop.
+3. If invalid or incompatible: comment in Jira explaining why. Flag to PO. Stop.
+4. If the description is vague or incomplete: update it in Jira before starting
+5. Assign to user if unassigned
+6. Transition to In Progress (transition_id: `2`)
+7. Continue to Step 2
 
 ### Step 2 — Classify and pick a track
 
@@ -36,20 +44,35 @@ Before anything else, fetch the Jira issue and assess it:
 ### Track: Direct
 1. Implement the fix
 2. Open PR (title includes Jira key: `ACHAT-XXX: ...`)
-3. Post PR link as Jira comment
+3. Post Jira comment with what changed + test steps for QA
 
 ### Track: Spec
 1. Create spec in `specs/` from the Jira task (pull description as input, flesh out edge cases and acceptance criteria)
 2. Implement from the spec
 3. Open PR with spec-derived description
-4. Post PR link as Jira comment
+4. Post Jira comment with what changed + test steps for QA
 
 ### Track: Full pipeline
 1. Create spec → review with PO (push key sections back to Jira for validation)
 2. Once agreed: generate plan + tasks
 3. Implement task by task
 4. Open PR per logical unit
-5. Update Jira on completion
+5. Post Jira comment with what changed + test steps for QA
+
+### Jira QA comment format
+Post this after every PR is opened — QA has no GitHub access:
+
+```
+✅ Implemented — pending staging deployment
+
+*What changed:*
+[1-2 sentences describing the change in plain language]
+
+*How to test:*
+1. [Step 1]
+2. [Step 2]
+3. Expected result: [expected result]
+```
 
 ---
 
