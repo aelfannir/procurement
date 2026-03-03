@@ -1,0 +1,6 @@
+# Symlinks to local project directories
+procurement-api
+procurement-app
+
+# IDE
+.idea/
