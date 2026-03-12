@@ -1,17 +1,16 @@
 <!--
 Sync Impact Report
 ===================
-Version change: 0.0.0 (template) → 1.0.0 (initial ratification)
-Modified principles: N/A (first version)
-Added sections:
-  - Scope (root workspace definition)
-  - Core Principles: I–VI defined (inherited from API constitution)
-  - Technical Constraints (both sub-projects)
-  - Development Workflow
-  - Governance
+Version change: 1.0.0 → 1.0.1
+Modified principles: None
+Added sections: None
 Removed sections: None
+Corrections:
+  - Branch naming: "NNN-short-name" → "ACHAT-XXX-short-name" (align
+    with CLAUDE.md Jira-key convention)
+  - Frontend stack: "React" → "React 19" (match CLAUDE.md precision)
 Templates requiring updates:
-  - .specify/templates/plan-template.md ✅ already has Constitution Check
+  - .specify/templates/plan-template.md ✅ no changes needed
   - .specify/templates/spec-template.md ✅ no changes needed
   - .specify/templates/tasks-template.md ✅ no changes needed
 Follow-up TODOs: None
@@ -95,13 +94,13 @@ flows are workspace-dependent.
   enum types must be `string` (ObjectMapper doesn't deserialize enums)
 
 ### Frontend (procurement-app/)
-- **Stack**: React, TypeScript, Vite
+- **Stack**: React 19, TypeScript, Vite
 - **Package manager**: pnpm
 - **Testing**: Run via `pnpm test`
 
 ### Shared
 - **Branching**: Feature branches target `dev`, never `main`
-- **Branch naming**: `NNN-short-name` (sequential number + kebab-case)
+- **Branch naming**: `ACHAT-XXX-short-name` (Jira key + kebab-case)
 
 ## Development Workflow
 
@@ -136,4 +135,4 @@ justified in research.md or rejected.
 Use `CLAUDE.md` for runtime development guidance and
 `.specify/memory/constitution.md` for governance principles.
 
-**Version**: 1.0.0 | **Ratified**: 2026-03-02 | **Last Amended**: 2026-03-02
+**Version**: 1.0.1 | **Ratified**: 2026-03-02 | **Last Amended**: 2026-03-12
