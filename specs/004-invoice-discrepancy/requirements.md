@@ -18,6 +18,7 @@ Parent: [spec.md](spec.md)
 - **FR-012**: Zero-discrepancy invoices MUST follow the existing standard flow unchanged.
 - **FR-013**: Payment schedule amount MUST use FRS_TTC (Devise).
 - **FR-014**: Accounting entries tab MUST display the generated lines per the applied rule.
+- **FR-015**: Bulk comptabilisation MUST skip invoices with discrepancies. The result MUST report success/error counts with message: "X succeeded, Y failed (discrepancy requires individual confirmation)".
 
 ## Non-Functional Requirements
 

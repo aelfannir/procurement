@@ -33,7 +33,7 @@ discrepancy management system that:
 | Clinic-favorable | FRS_TTC < SYS_TTC (vendor charges less than expected) |
 | Vendor-favorable | FRS_TTC > SYS_TTC (vendor charges more than expected) |
 | Threshold | Max vendor-favorable discrepancy allowed, per clinic |
-| (Devise) | Runtime currency label — replaced by the actual currency code (MAD, SAR, etc.) at display time |
+| (Devise) | The invoice's currency code (MAD, SAR, etc.). All amounts, thresholds, and comparisons use the invoice's currency. The clinic's reference country currency is only a default fallback when no invoice context exists. |
 
 ## Jira Story Mapping
 
@@ -74,7 +74,7 @@ ambiguous behavior. No step can be skipped or reordered.
 - What if threshold is 0 and discrepancy is vendor-favorable? Any vendor-favorable discrepancy (even 0.01) is blocked.
 - What if the discrepancy account references are deleted from the chart of accounts after being set on the clinic? The accounting entry generation should fail with a clear validation error.
 - What if an invoice is décomptabilisé and re-comptabilisé with a different discrepancy? A new audit entry is appended; the previous entry is preserved.
-- What about bulk comptabilisation? Invoices with discrepancies MUST be excluded from bulk operations (or each one individually confirmed — TBD with PO).
+- What about bulk comptabilisation? Invoices with discrepancies are skipped during bulk operations. The bulk result reports "X succeeded, Y failed (discrepancy requires individual confirmation)".
 
 ## File Index
 
