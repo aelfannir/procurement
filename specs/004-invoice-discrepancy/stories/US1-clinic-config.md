@@ -15,7 +15,7 @@ save — verify fields persist and validation enforces completeness.
 
 | Field | Type / Format | Required | Description |
 |-------|--------------|----------|-------------|
-| Seuil d'écart TTC autorisé | Decimal positive (18,2) | Yes | Threshold for vendor-favorable discrepancies only |
+| Seuil d'écart TTC autorisé | Decimal >= 0 (18,2) | Yes | Threshold for vendor-favorable discrepancies only |
 | Compte écart favorable à la clinique | Account reference (dropdown) | Yes | Account used when FRS_TTC < SYS_TTC |
 | Compte écart favorable au fournisseur | Account reference (dropdown) | Yes | Account used when FRS_TTC > SYS_TTC |
 
@@ -24,10 +24,9 @@ save — verify fields persist and validation enforces completeness.
 - The discrepancy config is NOT a standalone screen — it is integrated into the existing clinic form.
 - Parameters are available on both clinic **creation** and **modification**.
 - Currency is NOT configurable in this block — it is derived automatically from the clinic's reference country.
-- One discrepancy configuration per clinic (no duplicates).
+- The discrepancy configuration is carried directly on the clinic entity via 3 fields — there is no separate configuration object.
 - Account references are selected from the chart of accounts — no hard-coded account numbers.
 - Threshold can be 0 (meaning: no vendor-favorable discrepancy is tolerated).
-- If a clinic-level config exists, it takes priority over any generic configuration.
 
 ## Acceptance Scenarios
 
@@ -46,5 +45,8 @@ save — verify fields persist and validation enforces completeness.
 5. **Given** a clinic with threshold = 0, **When** I save, **Then** it
    succeeds (threshold 0 means no vendor-favorable discrepancy is allowed).
 6. **Given** a clinic form with all 3 discrepancy fields empty, **When** I
-   save, **Then** save is blocked with the first missing field message
-   (seuil d'écart TTC autorisé manquant).
+   save, **Then** save is blocked and all missing field messages are
+   displayed at once.
+7. **Given** a clinic form with threshold and clinic-favorable account
+   both missing, **When** I save, **Then** both validation messages are
+   displayed simultaneously.

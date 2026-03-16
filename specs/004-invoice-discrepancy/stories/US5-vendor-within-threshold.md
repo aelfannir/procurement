@@ -14,7 +14,7 @@ discrepancy <= threshold — verify reason is required and entries are correct.
 
 ## Business Rules
 
-- When FRS_TTC (Devise) > SYS_TTC (Devise) AND discrepancy <= clinic threshold:
+- When FRS_TTC (Devise) > SYS_TTC (Devise) AND discrepancy <= clinic threshold (including discrepancy = threshold exactly):
   - Receipt lines are debited for SYS_TTC (Devise).
   - The difference is debited to the **vendor-favorable discrepancy account** (configured on the clinic).
   - Vendor account 4411/4481 is credited for FRS_TTC (Devise).
@@ -31,5 +31,11 @@ discrepancy <= threshold — verify reason is required and entries are correct.
    - Credit: vendor account 4411/4481 for FRS_TTC (10,500)
 2. **Given** successful comptabilisation, **Then** the reason, user, date,
    and time are persisted in the invoice audit fields.
+
+3. **Given** an invoice with discrepancy exactly equal to the threshold,
+   **When** I enter a motif and confirm, **Then** comptabilisation proceeds
+   (écart = seuil is authorized).
+
+> **Note**: The accounting entry examples above are illustrative. The existing charge account breakdown (ventilation) remains unchanged.
 
 For vendor account, balance, payment schedule, and status rules: see [US7](US7-vendor-account-rule.md).

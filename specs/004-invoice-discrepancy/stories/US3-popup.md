@@ -14,7 +14,7 @@ accounting — it enforces user acknowledgment and mandatory reason capture.
 ## Popup Trigger
 
 The popup appears when `FRS_TTC (Devise) != SYS_TTC (Devise)`,
-UNLESS a blocking rule is already triggered (above-threshold or missing config).
+UNLESS a blocking rule is already triggered (above-threshold, missing config, or invalid account).
 
 ## Popup Template (exact wording)
 
@@ -29,6 +29,8 @@ Confirmez-vous la comptabilisation ?
 Champ : Motif de comptabilisation de l'écart
 Boutons : Confirmer / Annuler
 ```
+
+**Display rule**: The discrepancy amount (XX) is displayed as an **absolute value** (always positive). The direction (Favorable clinique / Favorable fournisseur) is shown separately as a label.
 
 ## Motif Rules
 

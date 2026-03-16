@@ -17,11 +17,10 @@ et la facture système. Comptabilisation impossible."
 
 This feature replaces that binary block with a clinic-level parameterized
 discrepancy management system that:
-- Allows automatic accounting of discrepancies favorable to the clinic (no threshold)
-- Allows automatic accounting of vendor-favorable discrepancies within a configured threshold
+- Authorizes comptabilisation of clinic-favorable discrepancies (no threshold), subject to user confirmation
+- Authorizes comptabilisation of vendor-favorable discrepancies within a configured threshold, subject to user confirmation with mandatory motif
 - Blocks vendor-favorable discrepancies above the threshold
 - Posts the discrepancy to configurable accounting accounts
-- Requires user confirmation with a mandatory reason for vendor-favorable discrepancies
 
 ## Business Definitions
 
@@ -61,7 +60,7 @@ ambiguous behavior. No step can be skipped or reordered.
 | 1. Calculate amounts | Compute SYS_TTC (Devise), FRS_TTC (Devise), Discrepancy (Devise), and discrepancy direction. |
 | 2. Zero discrepancy | If Discrepancy = 0, apply the existing standard accounting flow. Stop. |
 | 3. Verify config | If a discrepancy exists, verify the clinic has a discrepancy configuration. |
-| 4. Blocking checks | Check config completeness and threshold breach (vendor-favorable only). |
+| 4. Blocking checks | Check config completeness, account validity, and threshold breach (vendor-favorable only). |
 | 5. Show popup | The popup appears ONLY if the invoice remains accountable after business rules. |
 | 6. Validate motif | If motif is required and absent, refuse confirmation. |
 | 7. Generate entries | Generate the accounting entry for the applicable scenario. |
@@ -72,9 +71,9 @@ ambiguous behavior. No step can be skipped or reordered.
 
 - What if the clinic's country currency changes after discrepancy config is set? Currency is derived from the clinic's country — no manual currency field to go stale.
 - What if threshold is 0 and discrepancy is vendor-favorable? Any vendor-favorable discrepancy (even 0.01) is blocked.
-- What if the discrepancy account references are deleted from the chart of accounts after being set on the clinic? The accounting entry generation should fail with a clear validation error.
+- What if the discrepancy account configured on the clinic is no longer usable at comptabilisation time (deleted, inactive, or not selectable)? Comptabilisation is blocked. No popup, no entries generated. Message: "Le compte d'écart de la clinique [Nom clinique] est invalide. Merci de mettre à jour le paramétrage avant comptabilisation."
 - What if an invoice is décomptabilisé and re-comptabilisé with a different discrepancy? A new audit entry is appended; the previous entry is preserved.
-- What about bulk comptabilisation? Invoices with discrepancies are skipped during bulk operations. The bulk result reports "X succeeded, Y failed (discrepancy requires individual confirmation)".
+- What about bulk comptabilisation? Invoices with non-zero discrepancies are excluded from bulk processing (they require individual confirmation via popup). The bulk result reports: "X comptabilisée(s), Y ignorée(s) — écart détecté, confirmation individuelle requise." Invoices blocked by other rules (missing config, invalid accounts) are also excluded and reported separately.
 
 ## File Index
 

@@ -25,8 +25,8 @@ Parent: [spec.md](spec.md)
 | CA03 | Currency is derived automatically from the clinic's reference country — never manually entered. |
 | CA04 | All amounts (displayed, calculated, checked, mentioned in messages) include the (Devise) label. |
 | CA05 | Vendor account 4411/4481 always uses FRS_TTC (Devise). |
-| CA06 | Clinic-favorable discrepancies are accounted automatically without threshold check. |
-| CA07 | Vendor-favorable discrepancies are accounted automatically only if within the authorized threshold. |
+| CA06 | Clinic-favorable discrepancies are accounted after user confirmation, without threshold check. |
+| CA07 | Vendor-favorable discrepancies are accounted after user confirmation only if within the authorized threshold. |
 | CA08 | Any threshold breach blocks comptabilisation with the expected business message. |
 | CA09 | Missing or incomplete config blocks comptabilisation with an explicit message. |
 | CA10 | User confirmation and motif are traced per the defined audit rules. |

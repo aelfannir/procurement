@@ -34,4 +34,6 @@ correct.
 2. **Given** no threshold check is applied, **Then** any clinic-favorable
    discrepancy amount is accepted (even large amounts).
 
+> **Note**: The accounting entry examples above are illustrative. The existing charge account breakdown (ventilation) remains unchanged.
+
 For vendor account, balance, payment schedule, and status rules: see [US7](US7-vendor-account-rule.md).
