@@ -99,6 +99,10 @@ When working on a spec, load the relevant project context:
 
 ---
 
+## Language
+- All technical content must be in English: branch names, commit messages, PR titles/descriptions, code comments
+- Jira QA comments are in English
+
 ## Branching & PRs
 
 - Feature branches target `dev`, never `main`
@@ -120,3 +124,10 @@ If not, post a comment in Jira asking for clarification. Do not write code again
 
 Do not create a formal spec for bugs. Investigation notes in a short comment are enough.
 Reserve the spec format for tasks with real design decisions.
+
+## Active Technologies
+- PHP 8.2 / Symfony 7.x / API Platform 4.x (backend), React 19 / TypeScript / Vite (frontend) + API Platform, Doctrine ORM, DH Auditor (backend); React Query v3, shadcn/ui, Formik, i18next (frontend) (004-invoice-discrepancy)
+- PostgreSQL (existing) (004-invoice-discrepancy)
+
+## Recent Changes
+- 004-invoice-discrepancy: Added PHP 8.2 / Symfony 7.x / API Platform 4.x (backend), React 19 / TypeScript / Vite (frontend) + API Platform, Doctrine ORM, DH Auditor (backend); React Query v3, shadcn/ui, Formik, i18next (frontend)

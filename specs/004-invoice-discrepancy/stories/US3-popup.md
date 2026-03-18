@@ -56,4 +56,4 @@ Boutons : Confirmer / Annuler
 5. **Given** a confirmed discrepancy, **Then** the decision (confirm/cancel),
    motif, user, date, and time are logged in the invoice audit fields.
 6. **Given** all displayed amounts in the popup, **Then** they include
-   the (Devise) label derived from the clinic's reference country.
+   the (Devise) label derived from the invoice's purchase order currency.

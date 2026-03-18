@@ -33,6 +33,9 @@ correct.
    - Credit: clinic-favorable discrepancy account for 2,000
 2. **Given** no threshold check is applied, **Then** any clinic-favorable
    discrepancy amount is accepted (even large amounts).
+3. **Given** successful comptabilisation, **Then** discrepancy audit fields
+   are populated: motif (if provided), scenario, decision timestamp, and
+   decision user (see FR-011).
 
 > **Note**: The accounting entry examples above are illustrative. The existing charge account breakdown (ventilation) remains unchanged.
 
