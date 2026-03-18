@@ -38,7 +38,7 @@ reduce readability.
 3. **Given** an invoice where FRS_TTC > SYS_TTC, **When** I view the
    invoice, **Then** direction shows "Favorable fournisseur".
 4. **Given** any invoice, **When** I view it, **Then** all amounts display
-   with the clinic's (Devise) label (e.g., "MAD", "SAR").
+   with the invoice's (Devise) label (from PO currency, e.g., "MAD", "SAR").
 5. **Given** an invoice with a previously comptabilised discrepancy,
    **When** I view it, **Then** the motif field shows the saved reason.
 6. **Given** an invoice with no discrepancy, **When** I view it, **Then**

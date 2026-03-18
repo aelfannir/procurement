@@ -35,6 +35,9 @@ discrepancy <= threshold — verify reason is required and entries are correct.
 3. **Given** an invoice with discrepancy exactly equal to the threshold,
    **When** I enter a motif and confirm, **Then** comptabilisation proceeds
    (écart = seuil is authorized).
+4. **Given** successful comptabilisation, **Then** discrepancy audit fields
+   are populated: motif, scenario, decision timestamp, and decision user
+   (see FR-011).
 
 > **Note**: The accounting entry examples above are illustrative. The existing charge account breakdown (ventilation) remains unchanged.
 

@@ -29,5 +29,5 @@ above threshold — verify blocking message and no entries generated.
 2. **Given** the blocking message, **Then** no accounting entries are
    generated and the invoice remains on the current screen.
 3. **Given** the blocking message amounts, **Then** X (Devise) and Y
-   (Devise) are displayed in the currency derived from the clinic's
-   reference country.
+   (Devise) are displayed in the currency derived from the invoice's
+   purchase order currency.

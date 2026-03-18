@@ -7,7 +7,7 @@ Parent: [spec.md](spec.md)
 - **FR-001**: Clinic entity MUST have 3 new fields: `discrepancyThreshold` (decimal 18,2), `clinicFavorableAccount` (relation to Account), `vendorFavorableAccount` (relation to Account).
 - **FR-002**: All 3 discrepancy fields are ALWAYS mandatory on clinic save. Clinic save is blocked if any field is missing, with a field-specific validation message. When multiple fields are missing, all messages are displayed simultaneously. The blocking at accounting time (US8) is a safety net for legacy clinics created before this feature.
 - **FR-003**: Invoice screen MUST display: system amount, vendor amount, discrepancy value (signed), discrepancy direction, and motif (conditional — read-only, visible only after comptabilisation).
-- **FR-004**: All displayed amounts MUST include the (Devise) label derived from the clinic's country.
+- **FR-004**: All displayed amounts MUST include the (Devise) label derived from the invoice's purchase order currency (`PO.currencyCode`). The clinic's reference country currency is only a default fallback when no invoice context exists.
 - **FR-005**: Confirmation popup MUST appear for any non-zero discrepancy before comptabilisation (unless a blocking rule already prevents it).
 - **FR-006**: Reason field MUST be mandatory for vendor-favorable discrepancies, optional for clinic-favorable.
 - **FR-007**: Vendor-favorable discrepancies exceeding the threshold MUST be blocked with a specific message (no popup). Discrepancy exactly equal to threshold is authorized.
@@ -19,7 +19,7 @@ Parent: [spec.md](spec.md)
 - **FR-013**: Payment schedule amount MUST use FRS_TTC (Devise).
 - **FR-014**: Accounting entries tab MUST display the generated lines per the applied rule.
 - **FR-015**: Bulk comptabilisation MUST exclude invoices with non-zero discrepancies (individual confirmation required). The result MUST report: "X comptabilisée(s), Y ignorée(s) — écart détecté, confirmation individuelle requise." Invoices blocked by other rules (missing config, invalid accounts) are also excluded and reported separately.
-- **FR-016**: If the discrepancy account configured on the clinic is no longer usable at comptabilisation time (deleted, inactive, or not selectable), comptabilisation MUST be blocked. No popup, no entries generated. Message: "Le compte d'écart de la clinique [Nom clinique] est invalide. Merci de mettre à jour le paramétrage avant comptabilisation."
+- **FR-016**: If the discrepancy account configured on the clinic is no longer usable at comptabilisation time (deleted from DB — i.e., the relation is broken/null), comptabilisation MUST be blocked. No popup, no entries generated. Message: "Le compte d'écart de la clinique [Nom clinique] est invalide. Merci de mettre à jour le paramétrage avant comptabilisation." Note: the Account entity has no active/status field — "unusable" means the referenced entity no longer exists.
 
 ## Non-Functional Requirements
 
@@ -41,8 +41,8 @@ on each comptabilisation; previous entries are preserved (append-only).
 | Result | Comptabilisé / blocked / cancelled |
 
 **Storage**: Audit data is stored as structured fields on the Invoice entity
-(no separate audit entity). Fields: `discrepancyMotif`, `discrepancyDecision`,
-`discrepancyDecisionAt`, `discrepancyDecisionBy`, `discrepancyScenario`.
+(no separate audit entity). Fields: `discrepancyMotif`, `discrepancyScenario`,
+`discrepancyDecisionAt`, `discrepancyDecisionBy`.
 
 ## Key Entities
 
