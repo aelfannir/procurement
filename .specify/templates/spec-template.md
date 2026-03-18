@@ -1,9 +1,8 @@
 # Feature Specification: [FEATURE NAME]
 
-**Feature Branch**: `[ACHAT-XXX-short-name]`
-**Created**: [DATE]
-**Status**: Draft
-**Target**: [api | app | both]
+**Feature Branch**: `[###-feature-name]`  
+**Created**: [DATE]  
+**Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
 ## User Scenarios & Testing *(mandatory)*
