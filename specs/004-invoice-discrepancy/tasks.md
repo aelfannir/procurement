@@ -18,10 +18,10 @@
 
 **Purpose**: Entity changes, enum, migration. MUST complete before any user story.
 
-- [ ] T001 [P] [API] Create `DiscrepancyDirectionEnum` backed enum in `procurement-api/src/Entity/Enumeration/DiscrepancyDirectionEnum.php` with cases: Null, ClinicFavorable, VendorFavorable
-- [ ] T002 [P] [API] Add 3 discrepancy fields to `procurement-api/src/Entity/Clinic.php`: `discrepancyThreshold` (decimal 18,2, nullable), `clinicFavorableAccount` (ManyToOne Account, nullable), `vendorFavorableAccount` (ManyToOne Account, nullable). Add serialization groups: ClinicListing (threshold only), ClinicDetail, ClinicCreate, ClinicUpdate. Do NOT add Assert constraints here — validation is handled entirely in T005.
-- [ ] T003 [P] [API] Add 4 audit fields to `procurement-api/src/Entity/Invoice.php`: `discrepancyMotif` (string 500, nullable), `discrepancyScenario` (string 50, nullable), `discrepancyDecisionAt` (datetime_immutable, nullable), `discrepancyDecisionBy` (ManyToOne User, nullable). Add read-only serialization group: InvoiceDetail.
-- [ ] T004 [API] Generate and review Doctrine migration: `docker compose exec php php bin/console doctrine:migrations:diff`. Verify SQL matches data-model.md schema. Run: `docker compose exec php php bin/console doctrine:migrations:migrate`
+- [x] T001 [P] [API] Create `DiscrepancyDirectionEnum` backed enum in `procurement-api/src/Entity/Enumeration/DiscrepancyDirectionEnum.php` with cases: None, ClinicFavorable, VendorFavorable
+- [x] T002 [P] [API] Add 3 discrepancy fields to `procurement-api/src/Entity/Clinic.php`: `discrepancyThreshold` (decimal 18,2, nullable), `clinicFavorableAccount` (ManyToOne Account, nullable), `vendorFavorableAccount` (ManyToOne Account, nullable). Add serialization groups: ClinicListing (threshold only), ClinicDetail, ClinicCreate, ClinicUpdate. Do NOT add Assert constraints here — validation is handled entirely in T005.
+- [x] T003 [P] [API] Add 4 audit fields to `procurement-api/src/Entity/Invoice.php`: `discrepancyMotif` (string 500, nullable), `discrepancyScenario` (string 50, nullable), `discrepancyDecisionAt` (datetime_immutable, nullable), `discrepancyDecisionBy` (ManyToOne User, nullable). Add read-only serialization group: InvoiceDetail.
+- [x] T004 [API] Generate and review Doctrine migration: `docker compose exec php php bin/console doctrine:migrations:diff`. Verify SQL matches data-model.md schema. Run: `docker compose exec php php bin/console doctrine:migrations:migrate`
 
 **Checkpoint**: Entities ready. Clinic API exposes 3 new fields. Invoice API exposes 4 audit fields.
 
@@ -35,13 +35,13 @@
 
 ### Backend [API]
 
-- [ ] T005 [US1] [API] Add ALL clinic validation constraints in `procurement-api/src/Entity/Clinic.php`: `#[Assert\NotNull]` on all 3 fields, `#[Assert\GreaterThanOrEqual(0)]` on threshold, plus `#[Assert\Callback]` or custom validator to produce field-specific French messages per US1 acceptance scenarios (e.g., "Le paramétrage d'écart de la clinique [Nom] est incomplet : seuil d'écart TTC autorisé manquant."). When multiple fields missing, all messages displayed simultaneously.
+- [x] T005 [US1] [API] Add ALL clinic validation constraints in `procurement-api/src/Entity/Clinic.php`: `#[Assert\NotNull]` on all 3 fields, `#[Assert\GreaterThanOrEqual(0)]` on threshold, plus `#[Assert\Callback]` or custom validator to produce field-specific French messages per US1 acceptance scenarios (e.g., "Le paramétrage d'écart de la clinique [Nom] est incomplet : seuil d'écart TTC autorisé manquant."). When multiple fields missing, all messages displayed simultaneously.
 
 ### Frontend [APP]
 
-- [ ] T006 [P] [US1] [APP] Add 3 fields to Clinic model in `procurement-app/src/modules/_sharedMapping/Clinic/Model.ts`: `discrepancyThreshold` (number), `clinicFavorableAccount` (string IRI | null), `vendorFavorableAccount` (string IRI | null)
-- [ ] T007 [US1] [APP] Add 3 form fields to Clinic mapping in `procurement-app/src/modules/_sharedMapping/Clinic/Mapping.tsx`: threshold as number input (decimal, min 0), clinicFavorableAccount as resource field (Account dropdown), vendorFavorableAccount as resource field (Account dropdown). Add to both create and update views.
-- [ ] T008 [P] [US1] [APP] Add i18n keys in `procurement-app/src/i18n/locales/fr/clinic.json` (or appropriate namespace): labels for the 3 discrepancy fields + validation error messages
+- [x] T006 [P] [US1] [APP] Add 3 fields to Clinic model in `procurement-app/src/modules/_sharedMapping/Clinic/Model.ts`: `discrepancyThreshold` (number), `clinicFavorableAccount` (string IRI | null), `vendorFavorableAccount` (string IRI | null)
+- [x] T007 [US1] [APP] Add 3 form fields to Clinic mapping in `procurement-app/src/modules/_sharedMapping/Clinic/Mapping.tsx`: threshold as number input (decimal, min 0), clinicFavorableAccount as resource field (Account dropdown), vendorFavorableAccount as resource field (Account dropdown). Add to both create and update views.
+- [x] T008 [P] [US1] [APP] Add i18n keys in `procurement-app/src/i18n/locales/fr/clinic.json` (or appropriate namespace): labels for the 3 discrepancy fields + validation error messages
 
 **Checkpoint**: Clinic form shows 3 discrepancy fields. Save blocked when any is missing. Threshold = 0 accepted.
 
@@ -53,14 +53,14 @@
 
 **Independent Test**: Comptabilise invoices across all scenarios (zero, clinic-favorable, vendor-within, vendor-above, missing config) — verify correct entries or blocking.
 
-- [ ] T009 [US9] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 1-2: Extract amount calculation into a dedicated method. If discrepancy = 0, call existing standard flow and return (US9 regression safety). Remove old hard-coded 0.01 tolerance.
-- [ ] T010 [US8] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 3-4 (config checks): When discrepancy != 0, verify clinic has `discrepancyThreshold` + both account relations set. Return 422 with field-specific message if missing/incomplete (US8 messages). Check account validity — return 422 with "compte d'écart invalide" if account is unusable (FR-016).
-- [ ] T011 [US6] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 4 (threshold check): If vendor-favorable AND discrepancy > threshold, return 422 with threshold-exceeded message including amounts in (Devise). No popup, no entries.
-- [ ] T012 [US4] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 7 (clinic-favorable entries): When FRS_TTC < SYS_TTC, generate entries: debit charge accounts for SYS_TTC, credit vendor account for FRS_TTC, credit clinic-favorable discrepancy account for the difference.
-- [ ] T013 [US5] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 7 (vendor-favorable entries): When FRS_TTC > SYS_TTC AND discrepancy <= threshold, generate entries: debit charge accounts for SYS_TTC, debit vendor-favorable discrepancy account for difference, credit vendor account for FRS_TTC.
-- [ ] T014 [US7] [API] Verify in `procurement-api/src/Service/AccountingService.php` — Step 8 (balance check): Ensure total debits = total credits for both discrepancy scenarios. Verify vendor account always uses `totalAmount` (= FRS_TTC). Verify `buildPaymentTerms()` already uses `totalAmount` (= FRS_TTC) for payment schedule (FR-013). If any check fails, fix the logic. Add a runtime assertion as safety net (FR-009).
-- [ ] T015 [US3] [API] Update `procurement-api/src/Controller/AccountingController.php`: accept optional `discrepancyMotif` string in request body for `POST /custom/accounting/{idInvoice}`. Pass motif to `AccountingService`. Validate motif required when vendor-favorable (FR-006) — return 422 with "Le motif de comptabilisation de l'écart est obligatoire lorsque l'écart est favorable au fournisseur."
-- [ ] T016 [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 9 (audit + status): On successful comptabilisation with non-zero discrepancy, persist audit fields on Invoice: `discrepancyMotif`, `discrepancyScenario` (e.g., "clinic_favorable" or "vendor_within_threshold"), `discrepancyDecisionAt` (now), `discrepancyDecisionBy` (current user). Set `accounted = true` as before.
+- [x] T009 [US9] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 1-2: Extract amount calculation into a dedicated method. If discrepancy = 0, call existing standard flow and return (US9 regression safety). Remove old hard-coded 0.01 tolerance.
+- [x] T010 [US8] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 3-4 (config checks): When discrepancy != 0, verify clinic has `discrepancyThreshold` + both account relations set. Return 422 with field-specific message if missing/incomplete (US8 messages). Check account validity — return 422 with "compte d'écart invalide" if account is unusable (FR-016).
+- [x] T011 [US6] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 4 (threshold check): If vendor-favorable AND discrepancy > threshold, return 422 with threshold-exceeded message including amounts in (Devise). No popup, no entries.
+- [x] T012 [US4] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 7 (clinic-favorable entries): When FRS_TTC < SYS_TTC, generate entries: debit charge accounts for SYS_TTC, credit vendor account for FRS_TTC, credit clinic-favorable discrepancy account for the difference.
+- [x] T013 [US5] [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 7 (vendor-favorable entries): When FRS_TTC > SYS_TTC AND discrepancy <= threshold, generate entries: debit charge accounts for SYS_TTC, debit vendor-favorable discrepancy account for difference, credit vendor account for FRS_TTC.
+- [x] T014 [US7] [API] Verify in `procurement-api/src/Service/AccountingService.php` — Step 8 (balance check): Ensure total debits = total credits for both discrepancy scenarios. Verify vendor account always uses `totalAmount` (= FRS_TTC). Verify `buildPaymentTerms()` already uses `totalAmount` (= FRS_TTC) for payment schedule (FR-013). If any check fails, fix the logic. Add a runtime assertion as safety net (FR-009).
+- [x] T015 [US3] [API] Update `procurement-api/src/Controller/AccountingController.php`: accept optional `discrepancyMotif` string in request body for `POST /custom/accounting/{idInvoice}`. Pass motif to `AccountingService`. Validate motif required when vendor-favorable (FR-006) — return 422 with "Le motif de comptabilisation de l'écart est obligatoire lorsque l'écart est favorable au fournisseur."
+- [x] T016 [API] Refactor `procurement-api/src/Service/AccountingService.php` — Step 9 (audit + status): On successful comptabilisation with non-zero discrepancy, persist audit fields on Invoice: `discrepancyMotif`, `discrepancyScenario` (e.g., "clinic_favorable" or "vendor_within_threshold"), `discrepancyDecisionAt` (now), `discrepancyDecisionBy` (current user). Set `accounted = true` as before.
 
 **Checkpoint**: Backend handles all 9 processing steps. CT01-CT08 scenarios work via API.
 
@@ -72,9 +72,9 @@
 
 **Independent Test**: Open an invoice with FRS_TTC != SYS_TTC — verify all fields displayed with correct values.
 
-- [ ] T017 [P] [US2] [APP] Add audit fields to Invoice model in `procurement-app/src/modules/_sharedMapping/Invoice/Model.ts`: `discrepancyMotif` (string | null), `discrepancyScenario` (string | null), `discrepancyDecisionAt` (string | null), `discrepancyDecisionBy` (string IRI | null)
-- [ ] T018 [US2] [APP] Add discrepancy summary section to Invoice detail view in `procurement-app/src/modules/_sharedMapping/Invoice/Mapping.tsx`: display system amount (`calculatedTotalInclTax`), vendor amount (`totalAmount`), discrepancy (`amountDifference`, signed), direction label (derived: Nul / Favorable clinique / Favorable fournisseur). Add visual indicator (badge/color) for discrepancy status. Show motif (read-only) when present, hide when no discrepancy. All amounts with currency format using PO's `currencyCode`.
-- [ ] T019 [P] [US2] [APP] Add i18n keys in `procurement-app/src/i18n/locales/fr/invoice.json`: labels for discrepancy display section (montant_systeme, montant_fournisseur, ecart, sens_ecart, motif), direction values (nul, favorable_clinique, favorable_fournisseur)
+- [x] T017 [P] [US2] [APP] Add audit fields to Invoice model in `procurement-app/src/modules/_sharedMapping/Invoice/Model.ts`: `discrepancyMotif` (string | null), `discrepancyScenario` (string | null), `discrepancyDecisionAt` (string | null), `discrepancyDecisionBy` (string IRI | null)
+- [x] T018 [US2] [APP] Add discrepancy summary section to Invoice detail view in `procurement-app/src/modules/_sharedMapping/Invoice/Mapping.tsx`: display system amount (`calculatedTotalInclTax`), vendor amount (`totalAmount`), discrepancy (`amountDifference`, signed), direction label (derived: Nul / Favorable clinique / Favorable fournisseur). Add visual indicator (badge/color) for discrepancy status. Show motif (read-only) when present, hide when no discrepancy. All amounts with currency format using PO's `currencyCode`.
+- [x] T019 [P] [US2] [APP] Add i18n keys in `procurement-app/src/i18n/locales/fr/invoice.json`: labels for discrepancy display section (montant_systeme, montant_fournisseur, ecart, sens_ecart, motif), direction values (nul, favorable_clinique, favorable_fournisseur)
 
 **Checkpoint**: Invoice screen shows discrepancy summary. Motif hidden before comptabilisation. Currency labels correct.
 
@@ -86,9 +86,9 @@
 
 **Independent Test**: Click Comptabiliser on a discrepancy invoice — verify popup, motif validation, cancel behavior, blocking messages.
 
-- [ ] T020 [US3] [APP] Create `procurement-app/src/modules/_sharedMapping/Invoice/components/DiscrepancyConfirmDialog.tsx`: Dialog component (not ConfirmationModal) displaying: discrepancy amount (absolute value), system amount, vendor amount, direction label, Textarea for motif, Confirmer/Annuler buttons. Motif validation: required if vendor-favorable, optional if clinic-favorable. Error message on empty mandatory motif. All amounts with CurrencyFormat using PO currency. Use exact popup template wording from US3.
-- [ ] T021 [US3] [APP] Refactor `procurement-app/src/modules/_sharedMapping/Invoice/components/AccountingButton.tsx`: Before calling API, detect non-zero discrepancy from invoice data (`amountDifference != 0`). Compute direction from sign. If discrepancy exists: show `DiscrepancyConfirmDialog` instead of simple `ConfirmationModal`. On confirm: send POST with `{ discrepancyMotif }` in body. On cancel: close dialog, no API call. Handle 422 responses: display blocking messages as toast (threshold exceeded, missing config, invalid account, missing motif). Zero discrepancy: use existing simple confirmation flow unchanged (US9).
-- [ ] T022 [P] [US3] [APP] Add i18n keys in `procurement-app/src/i18n/locales/fr/invoice.json`: popup title, popup description template, motif label, motif required error, blocking error messages (threshold exceeded, missing config, incomplete config, invalid account)
+- [x] T020 [US3] [APP] Create `procurement-app/src/modules/_sharedMapping/Invoice/components/DiscrepancyConfirmDialog.tsx`: Dialog component (not ConfirmationModal) displaying: discrepancy amount (absolute value), system amount, vendor amount, direction label, Textarea for motif, Confirmer/Annuler buttons. Motif validation: required if vendor-favorable, optional if clinic-favorable. Error message on empty mandatory motif. All amounts with CurrencyFormat using PO currency. Use exact popup template wording from US3.
+- [x] T021 [US3] [APP] Refactor `procurement-app/src/modules/_sharedMapping/Invoice/components/AccountingButton.tsx`: Before calling API, detect non-zero discrepancy from invoice data (`amountDifference != 0`). Compute direction from sign. If discrepancy exists: show `DiscrepancyConfirmDialog` instead of simple `ConfirmationModal`. On confirm: send POST with `{ discrepancyMotif }` in body. On cancel: close dialog, no API call. Handle 422 responses: display blocking messages as toast (threshold exceeded, missing config, invalid account, missing motif). Zero discrepancy: use existing simple confirmation flow unchanged (US9).
+- [x] T022 [P] [US3] [APP] Add i18n keys in `procurement-app/src/i18n/locales/fr/invoice.json`: popup title, popup description template, motif label, motif required error, blocking error messages (threshold exceeded, missing config, incomplete config, invalid account)
 
 **Checkpoint**: Full accounting flow works end-to-end. Popup shows for discrepancies. Blocking messages for above-threshold/missing config. Zero discrepancy unchanged.
 
@@ -100,9 +100,9 @@
 
 **Independent Test**: Run bulk on mixed invoices — verify discrepancy invoices excluded and reported.
 
-- [ ] T023 [P] [API] Update `procurement-api/src/Controller/AccountingController.php` bulk endpoint: detect non-zero discrepancy per invoice before calling service. Add `excluded` status to response with reason `discrepancy_requires_confirmation`. Return enhanced summary: `{totalProcessed, success, failed, excluded}`. Note: frontend also filters client-side (T024) for UX speed; this backend check is a safety net.
-- [ ] T024 [P] [APP] Update `procurement-app/src/modules/_sharedMapping/Invoice/components/AccountingMass/useBulkAccounting.ts`: filter out invoices with `amountDifference != 0` before sending to bulk endpoint for UX speed (backend also validates as safety net — T023). Show excluded count in result summary. Update `BulkAccountingModal.tsx` to display excluded invoices message: "X comptabilisée(s), Y ignorée(s) — écart détecté, confirmation individuelle requise."
-- [ ] T025 [P] [APP] Add i18n keys in `procurement-app/src/i18n/locales/fr/invoice.json` for bulk exclusion message
+- [x] T023 [P] [API] Update `procurement-api/src/Controller/AccountingController.php` bulk endpoint: detect non-zero discrepancy per invoice before calling service. Add `excluded` status to response with reason `discrepancy_requires_confirmation`. Return enhanced summary: `{totalProcessed, success, failed, excluded}`. Note: frontend also filters client-side (T024) for UX speed; this backend check is a safety net.
+- [x] T024 [P] [APP] Update `procurement-app/src/modules/_sharedMapping/Invoice/components/AccountingMass/useBulkAccounting.ts`: filter out invoices with `amountDifference != 0` before sending to bulk endpoint for UX speed (backend also validates as safety net — T023). Show excluded count in result summary. Update `BulkAccountingModal.tsx` to display excluded invoices message: "X comptabilisée(s), Y ignorée(s) — écart détecté, confirmation individuelle requise."
+- [x] T025 [P] [APP] Add i18n keys in `procurement-app/src/i18n/locales/fr/invoice.json` for bulk exclusion message
 
 **Checkpoint**: Bulk skips discrepancy invoices. Result shows success/excluded counts.
 
@@ -114,8 +114,8 @@
 
 - [ ] T026 Verify CT01-CT09 test cases pass end-to-end (manual or automated)
 - [ ] T027 Verify CA01-CA10 acceptance criteria are met
-- [ ] T028 Verify accounting entries tab displays generated lines correctly (FR-014) in `procurement-app/src/modules/_sharedMapping/Invoice/Mapping.tsx` — the existing `UnifiedAccountingTable` component should already show the new discrepancy entries. Verify and adjust if needed.
-- [ ] T029 Verify concurrent comptabilisation is serialized (NFR-001) in `procurement-api/src/Service/AccountingService.php` — check for optimistic lock or DB-level serialization. Add safeguard if missing.
+- [x] T028 Verify accounting entries tab displays generated lines correctly (FR-014) in `procurement-app/src/modules/_sharedMapping/Invoice/Mapping.tsx` — the existing `UnifiedAccountingTable` component should already show the new discrepancy entries. Verify and adjust if needed.
+- [x] T029 Verify concurrent comptabilisation is serialized (NFR-001) in `procurement-api/src/Service/AccountingService.php` — check for optimistic lock or DB-level serialization. Add safeguard if missing.
 - [ ] T030 Run quickstart.md verification checklist
 
 ---
