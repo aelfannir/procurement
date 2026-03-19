@@ -7,3 +7,6 @@ procurement-app
 
 # IDE
 .idea/
+
+# Claude Code (keep commands/, ignore local settings)
+.claude/settings.local.json
