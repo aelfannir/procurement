@@ -15,6 +15,8 @@ Add multi-currency support to purchase orders and invoices. A vendor has a count
 
 **5 new database fields. 0 new entities. 0 new settings screens.**
 
+**Why MVP**: The team is blocked — can't invoice a Saudi vendor (SAR) because the system only supports clinic currency. The original PO spec had 11 stories and 3 new entities (Currency, ExchangeRate, AnnualAverageRate) plus 3 admin screens. After analysis, 7 stories were eliminated: currency codes already exist on Country, exchange rates are available via a free global API, and invoices inherit from POs. This MVP unblocks the immediate need with minimal scope, and scales later using the same pattern (currencyCode + exchangeRate) on other entities.
+
 ### Design Principles
 
 1. **Vendor-facing = vendor currency** — PO amounts, invoice amounts, PDFs, Sage accounting all use vendor currency.
