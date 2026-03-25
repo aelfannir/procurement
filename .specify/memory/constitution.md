@@ -1,14 +1,13 @@
 <!--
 Sync Impact Report
 ===================
-Version change: 1.0.0 → 1.0.1
+Version change: 1.0.1 → 1.0.2
 Modified principles: None
 Added sections: None
 Removed sections: None
 Corrections:
-  - Branch naming: "NNN-short-name" → "ACHAT-XXX-short-name" (align
-    with CLAUDE.md Jira-key convention)
-  - Frontend stack: "React" → "React 19" (match CLAUDE.md precision)
+  - Scope: "React / TypeScript / Vite" → "React 19 / TypeScript / Vite"
+    (align with Technical Constraints section and CLAUDE.md)
 Templates requiring updates:
   - .specify/templates/plan-template.md ✅ no changes needed
   - .specify/templates/spec-template.md ✅ no changes needed
@@ -22,7 +21,7 @@ Follow-up TODOs: None
 
 This workspace encompasses both sub-projects:
 - **procurement-api/** — Backend (PHP 8.2 / Symfony 7.x / API Platform 4.x / PostgreSQL)
-- **procurement-app/** — Frontend (React / TypeScript / Vite)
+- **procurement-app/** — Frontend (React 19 / TypeScript / Vite)
 
 All specs (API-only, frontend-only, or cross-cutting) live here. Each spec declares a Target field: `api`, `app`, or `both`.
 
@@ -135,4 +134,4 @@ justified in research.md or rejected.
 Use `CLAUDE.md` for runtime development guidance and
 `.specify/memory/constitution.md` for governance principles.
 
-**Version**: 1.0.1 | **Ratified**: 2026-03-02 | **Last Amended**: 2026-03-12
+**Version**: 1.0.2 | **Ratified**: 2026-03-02 | **Last Amended**: 2026-03-25
