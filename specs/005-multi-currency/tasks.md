@@ -22,7 +22,7 @@
 
 **Purpose**: New service + migration — shared infrastructure for all stories
 
-- [ ] T001 [API] Create CurrencyApiService in `procurement-api/src/Service/CurrencyApiService.php` — inject HttpClientInterface, implement `getExchangeRate(string $fromCurrency, string $toCurrency, \DateTimeInterface $date): float` that calls `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@{date}/v1/currencies/{from}.json`, extracts rate to target currency, retries once on failure, throws exception if unavailable
+- [ ] T001 [API] Create CurrencyApiService in `procurement-api/src/Service/CurrencyApiService.php` — inject HttpClientInterface, implement `getExchangeRate(string $fromCurrency, string $toCurrency, \DateTimeInterface $date): float` that calls `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@{date}/v1/currencies/{from}.json`, extracts rate as `response[fromCurrency][toCurrency]` (e.g., `response.sar.mad` = 2.50), retries once on failure, throws exception if unavailable
 - [ ] T002 [API] Create Doctrine migration in `procurement-api/migrations/` — add `currency_code VARCHAR(3) DEFAULT NULL` and `exchange_rate DOUBLE PRECISION DEFAULT NULL` to `purchase_order` and `invoice` tables. Backfill: `currency_code` = clinic country currency, `exchange_rate` = 1. Then set both NOT NULL. Follow pattern from `Version20260305101500.php`.
 
 **Checkpoint**: CurrencyApiService callable, migration runnable. No user-facing changes yet.
@@ -33,7 +33,7 @@
 
 **Purpose**: Entity changes that all stories depend on
 
-- [ ] T003 [P] [API] Add `currencyCode` field to PurchaseOrder entity in `procurement-api/src/Entity/PurchaseOrder.php` — use `HasCurrencyCode` trait. Add `exchangeRate` float field with ORM Column. Add both to serialization groups: `PurchaseOrderDetail`, `PurchaseOrderListing`, `PurchaseOrderCreate`, `PurchaseOrderUpdate`, `PURCHASE_ORDER_PRINT`, `PURCHASE_ORDER_EXPORT`. Change `getCurrencyCode()` method (line 623) to return `$this->currencyCode` instead of clinic derivation.
+- [ ] T003 [P] [API] Add `currencyCode` field to PurchaseOrder entity in `procurement-api/src/Entity/PurchaseOrder.php` — use `HasCurrencyCode` trait. Add `exchangeRate` float field with ORM Column. Add both to serialization groups: `PurchaseOrderDetail`, `PurchaseOrderListing`, `PurchaseOrderCreate`, `PurchaseOrderUpdate`, `PURCHASE_ORDER_PRINT`, `PURCHASE_ORDER_EXPORT`. Override `getCurrencyCode()` method (line 623) to return `string` (non-nullable): `return $this->currencyCode` — trait returns `?string` but migration ensures NOT NULL.
 - [ ] T004 [P] [API] Add `currencyCode` field to Invoice entity in `procurement-api/src/Entity/Invoice.php` — use `HasCurrencyCode` trait. Add `exchangeRate` float field. Add both to serialization groups: `InvoiceListing`, `InvoiceDetail`, `INVOICE_PRINT`, `CreditNoteListing`, `CreditNoteDetail`. Add `getExchangeRate()` / `setExchangeRate()` methods.
 - [ ] T005 [API] Modify CurrencyExtension in `procurement-api/src/Doctrine/CurrencyExtension.php` — when an explicit `currencyCode` query parameter is present in the request, use that value instead of `LocaleService::getCurrencyCode()`. This allows PO product selection to filter ProductPricing by PO currency instead of user locale.
 
@@ -49,13 +49,13 @@
 
 ### Implementation
 
-- [ ] T006 [US1] [API] Add PO currency resolution logic — in PurchaseOrder entity or a state processor: on create/update, if `currencyCode` is set and differs from clinic currency, call `CurrencyApiService::getExchangeRate()` with PO `createdAt` date and store result in `exchangeRate`. If same currency, set `exchangeRate = 1`. If API fails after retry, return 422 with message "Taux de change indisponible. Veuillez réessayer."
+- [ ] T006 [US1] [API] Add PO currency resolution logic — in a state processor (API Platform First): on create/update, if `currencyCode` differs from clinic currency, call `CurrencyApiService::getExchangeRate()` with PO `createdAt` date and store result in `exchangeRate`. If same currency, set `exchangeRate = 1`. If API fails after retry, return 422 with message "Taux de change indisponible. Veuillez réessayer." Also handle currency change on existing POs (not just creation).
 - [ ] T007 [US1] [API] Handle vendor change on PO — when vendor changes on an existing PO, if `currencyCode` changes as a result, re-fetch exchange rate. Ensure `PurchaseOrderProduct` prices are refreshed (re-read from ProductPricing filtered by new currencyCode).
 - [ ] T008 [US1] [APP] Add currency dropdown to PO form in `procurement-app/src/modules/_sharedMapping/PurchaseOrder/Mapping.tsx` — add `currencyCode` field to FORM_VIEW with a select/combobox. Source: distinct `currencyCode` values from Country API (`/countries`). Default: clinic currency. Position: near vendor field.
-- [ ] T009 [US1] [APP] Create CurrencyField component in `procurement-app/src/modules/_sharedMapping/PurchaseOrder/fields/CurrencyField.tsx` — handles currency selection, triggers rate fetch via API, shows alert dialog (reuse ConfirmationModal pattern from VendorField.tsx) when currency changes with existing products. On confirm: re-fetch ProductPricing for all products in new currency.
-- [ ] T010 [US1] [APP] Modify ProductField in `procurement-app/src/modules/_sharedMapping/PurchaseOrder/fields/ProductField.tsx` — add `currencyCode` to the ProductPricing filter (line 110-129). Pass `currencyCode` from form values alongside vendor and status filters.
-- [ ] T011 [US1] [APP] Add dual-currency columns to PO product grid in `procurement-app/src/modules/_sharedMapping/PurchaseOrder/Mapping.tsx` — when `exchangeRate ≠ 1`, show 2 extra computed columns: "Montant HT (clinic)" = `priceExclTax × exchangeRate`, "Montant TTC (clinic)" = `priceInclTax × exchangeRate`. Use `CurrencyFormat` component with clinic currency code. Show totals in both currencies at bottom.
-- [ ] T012 [US1] [APP] Add currency badge to PO header — when `exchangeRate ≠ 1`, display a read-only badge showing "SAR → MAD (2.50)" with the rate. Hide when same currency.
+- [ ] T009 [US1] [APP] Create CurrencyField component in `procurement-app/src/modules/_sharedMapping/PurchaseOrder/fields/CurrencyField.tsx` — handles currency selection, triggers rate fetch via API (handle 422 response: display "Taux de change indisponible. Veuillez réessayer." and revert currency), shows alert dialog (reuse ConfirmationModal pattern from VendorField.tsx) when currency changes with existing products. On confirm: re-fetch ProductPricing for all products in new currency.
+- [ ] T010 [US1] [APP] Modify ProductField in `procurement-app/src/modules/_sharedMapping/PurchaseOrder/fields/ProductField.tsx` — add `currencyCode` to the ProductPricing filter (line 110-129). Pass `currencyCode` from form values alongside vendor and status filters. If no pricing found in selected currency, existing behavior applies (grossPrice = 0).
+- [ ] T011 [US1] [APP] Add dual-currency columns to PO product grid in `procurement-app/src/modules/_sharedMapping/PurchaseOrder/Mapping.tsx` — when `exchangeRate ≠ 1`, show 2 extra computed columns: "Montant HT (clinic)" = `Math.round(priceExclTax × exchangeRate * 100) / 100`, "Montant TTC (clinic)" = same rounding pattern. Use `CurrencyFormat` component with clinic currency code. Show totals in both currencies at bottom. All computed clinic amounts rounded to 2 decimal places.
+- [ ] T012 [US1] [APP] Add currency badge to PO header — when `exchangeRate ≠ 1`, display a read-only badge showing "SAR → MAD (2.5013)" with the rate (4 decimal places for FX precision). Hide when same currency.
 - [ ] T013 [US1] [APP] Add i18n keys for multi-currency UI — add translation keys to `procurement-app/src/i18n/fr/` and `procurement-app/src/i18n/en/` for: currency change warning dialog, exchange rate unavailable message, clinic currency column headers.
 
 **Checkpoint**: Foreign-currency PO can be created with dual-column display. Same-currency POs unchanged.
@@ -96,10 +96,11 @@
 
 **Purpose**: Final validation across all stories
 
-- [ ] T018 Verify ReceiptProduct.getCurrencyCode() in `procurement-api/src/Entity/ReceiptProduct.php` (line 324) — ensure it correctly reads from PO's stored currencyCode field via the chain.
-- [ ] T019 Run migration on staging and verify existing POs/invoices display correctly with backfilled currencyCode + exchangeRate = 1.
-- [ ] T020 End-to-end test: create PO in SAR → add products → create receipt → create invoice → trigger accounting → verify Sage receives MAD amounts.
-- [ ] T021 Verify dashboard queries work with `SUM(totalExclTax * exchangeRate)` pattern for clinic currency aggregation.
+- [ ] T018 [API] Update dashboard queries to use `SUM(amount * exchangeRate)` instead of `SUM(amount)` for all monetary aggregations on PurchaseOrder and Invoice — search for dashboard/reporting queries in `procurement-api/src/` that aggregate PO or Invoice totals and ensure they multiply by `exchangeRate` for clinic currency conversion.
+- [ ] T019 Verify ReceiptProduct.getCurrencyCode() in `procurement-api/src/Entity/ReceiptProduct.php` (line 324) — ensure it correctly reads from PO's stored currencyCode field via the chain.
+- [ ] T020 Run migration on staging and verify existing POs/invoices display correctly with backfilled currencyCode + exchangeRate = 1.
+- [ ] T021 End-to-end test: create PO in SAR → add products → create receipt → create invoice → trigger accounting → verify Sage receives MAD amounts.
+- [ ] T022 Verify dashboard totals show correct clinic currency amounts after multi-currency POs exist.
 
 ---
 
